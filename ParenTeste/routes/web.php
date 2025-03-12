@@ -6,6 +6,10 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\Auth\CadastroController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\ExameController;
+use App\Http\Controllers\Auth\AgendamentoController;
+
+
 
 /*
 Route::get('/teste1', function () {
@@ -52,6 +56,10 @@ Route::get('/cadastro', function () {
 
 Route::post('/cadastro', [CadastroController::class, 'cadastro']);
 
+
+
+
+
 // Outra rota protegida
 Route::middleware('auth')->get('/calculo', function () {
     return Inertia::render('Paternidade');
@@ -60,3 +68,13 @@ Route::middleware('auth')->get('/calculo', function () {
 Route::get('/exame', function () {
     return Inertia::render('Exame');
 });
+
+
+Route::post('/exame', [ExameController::class, 'store']);
+
+
+
+Route::post('/agendar-consulta', [AgendamentoController::class, 'store']);
+
+
+
