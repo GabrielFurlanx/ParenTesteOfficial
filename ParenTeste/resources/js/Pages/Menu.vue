@@ -109,6 +109,11 @@ export default {
     };
   },
   methods: {
+
+    exibirAlerta() {
+      alert('Este é um alerta de teste!');
+    },
+
     toggleSubmenu(submenu) {
       this.activeSubmenu = this.activeSubmenu === submenu ? null : submenu;
     },
@@ -131,13 +136,10 @@ export default {
     hora_consulta: this.horaConsulta,
   }, {
     onSuccess: () => {
+      alert('Consulta agendada com sucesso!'); // Mostra o alerta
       this.successMessage = 'Consulta agendada com sucesso!';
-
-      // Exibe o pop-up com a mensagem de sucesso
-      alert(this.successMessage);
     },
     onError: (errors) => {
-      // Exibe um erro se o agendamento falhar
       alert(errors.data_consulta ? errors.data_consulta[0] : 'Erro ao agendar.');
     }
   });
