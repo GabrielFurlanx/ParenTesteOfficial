@@ -12,8 +12,8 @@
             <i :class="activeSubmenu === 'testePaternidadeSubmenu' ? 'fas fa-chevron-down' : 'fas fa-chevron-right'" class="arrow-icon"></i>
           </a>
           <div class="submenu" :class="{ 'open': activeSubmenu === 'testePaternidadeSubmenu' }">
-            <a href="/calculo" class="list-group-item list-group-item-action submenu-item">Novo Teste</a>
-            <a href="#" class="list-group-item list-group-item-action submenu-item">Histórico de Laudos</a>
+            <a href="/paternidade-info" class="list-group-item list-group-item-action submenu-item">Novo Teste</a>
+            <a href="/historico-paternidade" class="list-group-item list-group-item-action submenu-item">Histórico de Laudos</a>
           </div>
 
           <!-- Item do menu Exame de Sangue com submenu -->

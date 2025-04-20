@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Agendamento;
 use Inertia\Inertia;
+use Carbon\Carbon;
 
 class AgendamentoController extends Controller
 {
@@ -28,4 +29,14 @@ class AgendamentoController extends Controller
             'successMessage' => 'Consulta agendada com sucesso!'
         ]);
     }
+
+
+public function listarConsultasHoje()
+{
+    $hoje = Carbon::today()->toDateString();
+
+    $consultasHoje = Agendamento::whereDate('data_consulta', $hoje)->get();
+
+    return response()->json($consultasHoje);
+}
 }

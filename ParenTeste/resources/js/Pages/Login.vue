@@ -32,11 +32,14 @@
               Login
             </button>
           </div>
+          <!--
           <div class="mt-4 text-center">
             <a href="#" class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800">
               Esqueceu a senha?
             </a>
           </div>
+          -->
+        </br>
           <div class="mt-2 text-center">
             <a href="#" class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800">
               Cadastrar usuário

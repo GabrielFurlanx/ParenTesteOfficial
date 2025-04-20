@@ -15,8 +15,8 @@
             <i :class="activeSubmenu === 'testePaternidadeSubmenu' ? 'fas fa-chevron-down' : 'fas fa-chevron-right'" class="arrow-icon"></i>
           </a>
           <div class="submenu" :class="{ 'open': activeSubmenu === 'testePaternidadeSubmenu' }">
-            <a href="/calculo" class="list-group-item list-group-item-action submenu-item">Novo Teste</a>
-            <a href="#" class="list-group-item list-group-item-action submenu-item">Histórico de Laudos</a>
+            <a href="/paternidade-info" class="list-group-item list-group-item-action submenu-item">Novo Teste</a>
+            <a href="/historico-paternidade" class="list-group-item list-group-item-action submenu-item">Histórico de Laudos</a>
           </div>
 
           <!-- Exame de Sangue -->
@@ -41,8 +41,7 @@
             <i class="fas fa-bars"></i>
           </button>
           <div class="ml-auto d-flex align-items-center">
-            <i class="fas fa-user user-icon"></i>
-            <span class="navbar-text">Usuário</span>
+            <span class="navbar-text">Bem-vindo ao Sistema</span>
           </div>
         </nav>
 
@@ -50,7 +49,31 @@
         <div class="container-fluid main-content">
           <div class="content-left">
             <h1 class="mt-4">ParenTeste</h1>
-            <p>Bem-vindo à página inicial do ParenTeste</p>
+            <div class="container mt-4">
+                <div class="container mt-4">
+  <h3>Consultas de Hoje</h3>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>Hora</th>
+        <th>Telefone</th>
+        <th>Email</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="consulta in consultasHoje" :key="consulta.id">
+        <td>{{ consulta.nome_paciente }}</td>
+        <td>{{ consulta.hora_consulta }}</td>
+        <td>{{ consulta.telefone }}</td>
+        <td>{{ consulta.email }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+    </div>
+
           </div>
 
           <!-- Formulário de Agendamento no Canto Direito -->
@@ -96,23 +119,36 @@ import { Inertia } from '@inertiajs/inertia';
 
 export default {
   name: 'Menu',
+  props: {
+    consultasHoje: Array, // Agora o Vue recebe as consultas direto do Laravel
+  },
+
   data() {
     return {
-      activeSubmenu: null, // Controla os submenus
+      activeSubmenu: null,
       nomePaciente: "",
       telefone: "",
       email: "",
       dataConsulta: "",
       horaConsulta: "",
-      minDate: "", // Data mínima para o calendário
-      successMessage: this.$page.props.successMessage || '', // Mensagem de sucesso do controlador
+      minDate: "",
+      successMessage: this.$page.props.successMessage || '',
+      //consultasHoje: []
     };
   },
   methods: {
 
-    exibirAlerta() {
-      alert('Este é um alerta de teste!');
-    },
+
+  async carregarConsultasHoje() {
+    try {
+      const response = await fetch('/consultas-hoje');
+      const data = await response.json();
+      this.consultasHoje = data;
+    } catch (error) {
+      console.error('Erro ao buscar consultas:', error);
+    }
+  },
+
 
     toggleSubmenu(submenu) {
       this.activeSubmenu = this.activeSubmenu === submenu ? null : submenu;
@@ -128,6 +164,12 @@ export default {
       Inertia.get('/exame');
     },
     agendarConsulta() {
+
+    if (this.horaConsulta < "08:00" || this.horaConsulta > "17:00") {
+        alert("O horário deve ser entre 08:00 e 17:00.");
+    return;
+  }
+
   Inertia.post('/agendar-consulta', {
     nome_paciente: this.nomePaciente,
     telefone: this.telefone,
@@ -154,6 +196,8 @@ export default {
       e.preventDefault();
       document.getElementById('wrapper').classList.toggle('toggled');
     });
+
+    this.carregarConsultasHoje();
   }
 }
 </script>
@@ -208,4 +252,12 @@ export default {
   .agendamento-container .form-group {
     margin-bottom: 10px;
   }
+
+  .table {
+  margin-left: 0; /* Remover margem à esquerda se houver algum */
+  width: 800px; /* Ajuste a largura se necessário */
+}
+
   </style>
+
+
