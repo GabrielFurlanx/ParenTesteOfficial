@@ -8,73 +8,58 @@ use App\Http\Controllers\Auth\CadastroController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ExameController;
 use App\Http\Controllers\Auth\AgendamentoController;
+use App\Http\Controllers\Auth\PaternidadeController;
+use App\Models\Agendamento;
+use Carbon\Carbon;
 
 
 
-/*
-Route::get('/teste1', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
-
-
-
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
-
-*/
-
-require __DIR__.'/auth.php';
-
-// Rota protegida do menu
-Route::middleware('auth')->get('/', function () {
-    return Inertia::render('Menu');
-});
-
-// Rotas de login
+// Rotas públicas (acessíveis sem login)
 Route::get('/login', function () {
     return Inertia::render('Login');
 })->name('login');
 
 Route::post('/login', [LoginController::class, 'login'])->name('login.perform');
 
-// Rota de cadastro
 Route::get('/cadastro', function () {
     return Inertia::render('Cadastro');
 });
 
 Route::post('/cadastro', [CadastroController::class, 'cadastro']);
 
-
-
-
-
-// Outra rota protegida
-Route::middleware('auth')->get('/calculo', function () {
-    return Inertia::render('Paternidade');
+Route::get('/paternidade-info', function () {
+    return Inertia::render('Paternidade_info');
 });
 
-Route::get('/exame', function () {
-    return Inertia::render('Exame');
+Route::get('/historico-paternidade', [PaternidadeController::class, 'laudos']);
+
+Route::get('/historico-laudos', [ExameController::class, 'laudos']);
+
+
+// Rotas protegidas (só acessa se estiver logado)
+Route::middleware('auth')->group(function () {
+
+    Route::get('/', function () {
+        $hoje = Carbon::now()->toDateString();
+        $consultasHoje = Agendamento::whereDate('data_consulta', $hoje)->get();
+
+        return Inertia::render('Menu', [
+            'consultasHoje' => $consultasHoje
+        ]);
+    });
+
+    Route::get('/calculo', function () {
+        return Inertia::render('Paternidade');
+    });
+
+    Route::get('/exame', function () {
+        return Inertia::render('Exame');
+    });
+
+    Route::post('/paternidade', [PaternidadeController::class, 'store']);
+    Route::post('/exame', [ExameController::class, 'store']);
+    Route::post('/agendar-consulta', [AgendamentoController::class, 'store']);
+    Route::get('/consultas-hoje', [ExameController::class, 'listarConsultasHoje']);
 });
-
-
-Route::post('/exame', [ExameController::class, 'store']);
-
-
-
-Route::post('/agendar-consulta', [AgendamentoController::class, 'store']);
-
 
 

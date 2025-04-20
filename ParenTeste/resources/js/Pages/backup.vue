@@ -24,22 +24,20 @@
               </thead>
               <tbody>
                 <tr v-for="(row, index) in rows" :key="index">
-      <td>{{ names[index] }}</td>
-      <td><input type="number" v-model.number="row.input1" class="input-alelo" /></td>
-      <td><input type="number" v-model.number="row.input2" class="input-alelo" /></td>
-      <td><input type="number" v-model.number="row.input3" class="input-alelo" /></td>
-      <td><input type="number" v-model.number="row.input4" class="input-alelo" /></td>
-      <td class="index-value">{{ calculateIndex(row) }}</td>
-    </tr>
+                  <td>{{ names[index] }}</td>
+                  <td><input type="number" v-model.number="row.input1" /></td>
+                  <td><input type="number" v-model.number="row.input2" /></td>
+                  <td><input type="number" v-model.number="row.input3" /></td>
+                  <td><input type="number" v-model.number="row.input4" /></td>
+                  <td>{{ calculateIndex(row) }}</td>
+                </tr>
               </tbody>
             </table>
             <p><strong>IP Acumulado:</strong> {{ ipAcumulado }}</p>
             <p><strong>PP %:</strong> {{ ppPercentage }}%</p>
-            <div class="flex space-x-4">
+
             <!-- Botão para abrir o modal -->
             <button class="btn-modal" @click="showModal = true">Ver Tabela Detalhada</button>
-            <button class="btn-save" @click="salvarDados">Salvar Exame</button>
-        </div>
           </div>
         </div>
       </div>
@@ -87,7 +85,6 @@
 
 <script>
 import Sidebar from './Sidebar.vue';
-import axios from 'axios';
 
 export default {
   components: {
@@ -121,8 +118,7 @@ export default {
           rg: '',
           cpf: ''
         }
-      },
-      salvando: false // Novo estado adicionado
+      }
     };
   },
   mounted() {
@@ -143,8 +139,7 @@ export default {
           certidao: parsedData.crianca.certidao || 'Não informado',
           mae: parsedData.crianca.maeNome || 'Não informado',
           maeRG: parsedData.crianca.maeRg || 'Não informado',
-          maeCPF: parsedData.crianca.maeCpf || 'Não informado',
-          cpf: parsedData.crianca.cpf || 'Não informado'
+          maeCPF: parsedData.crianca.maeCpf || 'Não informado'
         },
         investigado: {
           nome: parsedData.investigado.nome || 'Não informado',
@@ -168,74 +163,6 @@ export default {
     }
   },
   methods: {
-    async salvarDados() {
-  if (this.salvando) return;
-  this.salvando = true;
-
-  try {
-    // Converter a data do formato brasileiro para formato ISO
-    const dataParts = this.dadosExame.data.split('/');
-    const dataFormatada = dataParts.length === 3
-      ? `${dataParts[2]}-${dataParts[1].padStart(2, '0')}-${dataParts[0].padStart(2, '0')}`
-      : null;
-
-    // Montar estrutura da tabela completa para salvar em dados_exame
-    const tabelaCompleta = this.names.map((name, index) => {
-      return {
-        nome: name,
-        crianca: [this.rows[index].input1, this.rows[index].input2],
-        investigado: [this.rows[index].input3, this.rows[index].input4],
-        indice: this.calculateIndex(this.rows[index])
-      };
-    });
-
-    // Incluir também IP acumulado e PP %
-    const dadosExameCompleto = {
-      tabela: tabelaCompleta,
-      ip_acumulado: this.ipAcumulado,
-      pp_percentage: this.ppPercentage
-    };
-
-    const dadosParaEnviar = {
-      nome_crianca: this.dadosExame.filho.nome,
-      certidao_crianca: this.dadosExame.filho.certidao,
-      cpf_crianca: this.dadosExame.filho.cpf,
-      nome_mae: this.dadosExame.filho.mae,
-      rg_mae: this.dadosExame.filho.maeRG,
-      cpf_mae: this.dadosExame.filho.maeCPF,
-      nome_investigado: this.dadosExame.investigado.nome,
-      rg_investigado: this.dadosExame.investigado.rg,
-      cpf_investigado: this.dadosExame.investigado.cpf,
-      data_exame: dataFormatada,
-      ip_acumulado: this.ipAcumulado,
-      probabilidade_paternidade: this.ppPercentage,
-      dados_exame: dadosExameCompleto // Salva a estrutura completa da tabela como JSON
-    };
-
-    console.log('Dados formatados para envio:', dadosParaEnviar);
-
-    const response = await axios.post('/paternidade', dadosParaEnviar, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      }
-    });
-
-    if (response.status >= 200 && response.status < 300) {
-  alert('Dados salvos com sucesso!');
-} else {
-  alert('Falha ao salvar dados.');
-}
-  } catch (error) {
-    console.error('Erro detalhado:', error.response || error);
-    alert(`Erro ao salvar: ${error.response?.data?.message || error.message}`);
-  } finally {
-    this.salvando = false;
-  }
-
-
-    },
-
     calculateIndex(row) {
       if (!row.input1 || !row.input2 || !row.input3 || !row.input4) return 0;
 
@@ -272,6 +199,7 @@ export default {
     imprimirModal() {
       const tabela = document.querySelector('.detailed-table').cloneNode(true);
 
+      // Corrige a exibição dos valores na tabela clonada
       const rows = tabela.querySelectorAll('tbody tr');
       this.rows.forEach((row, index) => {
         const cells = rows[index].querySelectorAll('td');
@@ -429,35 +357,19 @@ input {
   font-size: 16px;
 }
 
-.btn-save {
-  padding: 10px 20px;
-  background-color: #52cf4b;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  font-size: 16px;
-}
-
-.btn-save:hover {
-  background-color: #65bd82;
-}
-
-
 .btn-modal {
-    padding: 10px 20px;
-  background-color: #2196F3;
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #4CAF50;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s;
-  font-size: 16px;
 }
 
 .btn-modal:hover {
-  background-color: #0b7dda;
+  background-color: #45a049;
 }
 
 /* Estilos do Modal */
@@ -627,19 +539,5 @@ h3 {
   .close {
     display: none;
   }
-}
-
-.action-buttons {
-  display: flex;
-  gap: 15px;
-  margin-top: 20px;
-  justify-content: center;
-}
-
-
-
-.btn-save:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
 }
 </style>
